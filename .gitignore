@@ -1,16 +1,36 @@
-# Git portable (if needed)
-!C:\Users\HP\git-portable
+# .gitignore - Ignore unnecessary files
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# OS files
+# OS generated files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
-# Temporary files
-*.tmp
-*.temp
+# Editor directories and files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 # Logs
+logs
 *.log
 
-# Node modules (if any)
-node_modules/
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Upload files (not needed in repo)
+upload_*.txt
+upload_*.jpg
