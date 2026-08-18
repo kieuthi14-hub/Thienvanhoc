@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Thiên Văn Học - Trò Chơi Vui</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root { --primary:#0284C7;--primary-light:#38BDF8;--accent:#F59E0B;--accent-light:#FBBF24;--success:#10B981;--success-light:#34D399;--danger:#EF4444;--warning:#F97316;--bg-start:#F0F9FF;--bg-mid:#FEF9C3;--bg-end:#FDF2F8;--text-dark:#1E293B;--text-muted:#64748B;--radius:24px;--shadow-tactile:0 8px 0 rgba(2,132,199,0.3),0 15px 25px rgba(0,0,0,0.08);--shadow-btn:0 5px 0 rgba(2,132,199,0.4),0 10px 20px rgba(0,0,0,0.1); }
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    body{font-family:'Nunito',sans-serif;min-height:100vh;background:linear-gradient(160deg,var(--bg-start),var(--bg-mid) 35%,var(--bg-end) 70%,#F0FDF4);color:var(--text-dark);overflow-x:hidden;position:relative}
+    .wave-bg{position:fixed;top:0;left:0;right:0;bottom:0;z-index:0;overflow:hidden;pointer-events:none}
+    .wave-bg::before,.wave-bg::after{content:'';position:absolute;width:220%;height:220%;background:radial-gradient(ellipse at center,rgba(2,132,199,0.07) 0%,transparent 65%);animation:waveDrift 30s ease-in-out infinite}
+    .wave-bg::after{background:radial-gradient(ellipse at 70% 30%,rgba(245,158,11,0.06) 0%,transparent 60%);animation-delay:-15s;animation-direction:reverse}
+    @keyframes waveDrift{0%,100%{transform:translate(-8%,-8%) rotate(0deg)}50%{transform:translate(8%,8%) rotate(3deg)}}
+    .stars{position:fixed;top:0;left:0;right:0;bottom:0;z-index:0;pointer-events:none;overflow:hidden}
+    .star{position:absolute;font-size:20px;opacity:0.25;animation:twinkle 3s ease-in-out infinite}
+    @keyframes twinkle{0%,100%{opacity:0.15;transform:scale(0.9)}50%{opacity:0.4;transform:scale(1.15)}}
+    .screen{display:none;position:relative;z-index:1;min-height:100vh;padding:16px 16px 40px}
+    .screen.active{display:flex;flex-direction:column;align-items:center}
+    .login-card{background:white;border-radius:32px;padding:clamp(28px,5vw,48px);max-width:480px;width:100%;margin-top:clamp(20px,5vh,60px);box-shadow:0 12px 0 rgba(2,132,199,0.15),0 24px 50px rgba(0,0,0,0.1);border-bottom:5px solid rgba(2,132,199,0.2);text-align:center;animation:slideUp 0.5s ease-out}
+    @keyframes slideUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+    .login-icon{font-size:72px;display:block;margin-bottom:16px;filter:drop-shadow(0 6px 12px rgba(0,0,0,0.15));animation:float 3s ease-in-out infinite}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+    .login-title{font-size:clamp(1.4rem,4vw,2rem);font-weight:900;color:var(--primary);margin-bottom:6px}
+    .login-sub{font-size:clamp(0.85rem,2.2vw,1rem);color:var(--text-muted);margin-bottom:28px;line-height:1.5}
+    .form-group{margin-bottom:18px;text-align:left}
+    .form-label{display:block;font-weight:800;font-size:0.85rem;color:var(--text-dark);margin-bottom:6px}
+    .form-input{width:100%;padding:14px 18px;border:3px solid #E2E8F0;border-radius:16px;font-size:1rem;font-family:'Nunito',sans-serif;font-weight:700;transition:all 0.2s;background:#F8FAFC}
+    .form-input:focus{outline:none;border-color:var(--primary);background:white;box-shadow:0 0 0 4px rgba(2,132,199,0.1)}
+    .avatar-grid{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:8px}
+    .avatar-opt{font-size:36px;cursor:pointer;border-radius:50%;width:60px;height:60px;display:flex;align-items:center;justify-content:center;border:3px solid #E2E8F0;background:white;transition:all 0.2s;box-shadow:0 4px 0 rgba(0,0,0,0.06)}
+    .avatar-opt:hover{transform:translateY(-3px);border-color:var(--primary-light)}
+    .avatar-opt.selected{border-color:var(--primary);background:#EFF6FF;transform:scale(1.1);box-shadow:0 4px 0 rgba(2,132,199,0.3)}
+    .btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,var(--primary),var(--primary-light));color:white;font-weight:800;font-size:clamp(1rem,2.5vw,1.15rem);padding:16px 40px;border-radius:50px;border:none;cursor:pointer;box-shadow:0 6px 0 rgba(2,132,199,0.4),0 12px 25px rgba(0,0,0,0.12);border-bottom:5px solid rgba(2,132,199,0.5);transition:all 0.18s cubic-bezier(0.34,1.56,0.64,1);font-family:'Nunito',sans-serif;width:100%;margin-top:8px}
+    .btn-primary:hover{transform:translateY(-3px);box-shadow:0 9px 0 rgba(2,132,199,0.4),0 18px 35px rgba(0,0,0,0.15)}
+    .btn-primary:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(2,132,199,0.4),0 6px 12px rgba(0,0,0,0.1);border-bottom-width:2px}
+    .btn-secondary{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:white;color:var(--primary);font-weight:800;padding:12px 28px;border-radius:50px;border:3px solid var(--primary);cursor:pointer;font-size:0.9rem;font-family:'Nunito',sans-serif;box-shadow:0 4px 0 rgba(2,132,199,0.15);transition:all 0.18s}
+    .btn-secondary:hover{transform:translateY(-2px);background:#EFF6FF}
+    .btn-secondary:active{transform:translateY(2px);box-shadow:none}
+    .btn-small{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:linear-gradient(135deg,var(--accent),var(--accent-light));color:white;font-weight:800;font-size:0.85rem;padding:10px 20px;border-radius:50px;border:none;cursor:pointer;box-shadow:0 4px 0 rgba(245,158,11,0.4);transition:all 0.18s;font-family:'Nunito',sans-serif}
+    .btn-small:hover{transform:translateY(-2px)}
+    .btn-small:active{transform:translateY(2px);box-shadow:none}
+    .hud{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(255,255,255,0.72);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:2px solid rgba(255,255,255,0.5);border-radius:0 0 24px 24px;padding:10px 16px;display:none;align-items:center;justify-content:space-between;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,0.08)}
+    .hud.active{display:flex}
+    .hud-left{display:flex;align-items:center;gap:10px}
+    .hud-avatar{font-size:32px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.15))}
+    .hud-name{font-weight:800;font-size:clamp(0.8rem,2vw,0.95rem);color:var(--text-dark)}
+    .hud-center{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;max-width:280px}
+    .hud-stars{display:flex;gap:4px;align-items:center}
+    .hud-star{font-size:22px;transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);filter:drop-shadow(0 2px 4px rgba(0,0,0,0.1))}
+    .hud-star.earned{animation:starPop 0.5s ease-out}
+    @keyframes starPop{0%{transform:scale(0) rotate(-180deg);opacity:0}60%{transform:scale(1.4) rotate(10deg)}100%{transform:scale(1) rotate(0deg);opacity:1}}
+    .hud-star.empty{opacity:0.3;filter:grayscale(1)}
+    .hud-progress-text{font-size:0.72rem;font-weight:800;color:var(--text-muted)}
+    .hud-right{display:flex;align-items:center;gap:8px}
+    .hud-btn{width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;background:white;box-shadow:0 3px 0 rgba(0,0,0,0.1);font-size:18px;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+    .hud-btn:hover{transform:translateY(-2px)}
+    .hud-btn:active{transform:translateY(2px);box-shadow:none}
+    .combo-badge{display:none;align-items:center;gap:4px;background:linear-gradient(135deg,#FF6B35,#F7931E);color:white;font-weight:900;font-size:0.75rem;padding:4px 10px;border-radius:20px;animation:comboShake 0.5s ease-in-out infinite;box-shadow:0 3px 8px rgba(255,107,53,0.4)}
+    .combo-badge.active{display:inline-flex}
+    @keyframes comboShake{0%,100%{transform:rotate(0deg)}25%{transform:rotate(-3deg)}75%{transform:rotate(3deg)}}
+    .countdown-bar-wrap{position:fixed;top:0;left:0;right:0;z-index:55;height:6px;background:rgba(0,0,0,0.1);display:none}
+    .countdown-bar-wrap.active{display:block}
+    .countdown-bar{height:100%;width:100%;border-radius:0 3px 3px 0;background:linear-gradient(90deg,var(--success),var(--primary-light));transition:width 0.1s linear,background 0.5s}
+    .countdown-bar.warning{background:linear-gradient(90deg,var(--accent),var(--warning))}
+    .countdown-bar.danger{background:var(--danger);animation:barPulse 0.5s ease-in-out infinite}
+    @keyframes barPulse{0%,100%{opacity:1}50%{opacity:0.6}}
+    .game-stage{margin-top:90px;width:100%;max-width:720px;display:flex;flex-direction:column;gap:20px;padding-bottom:40px}
+    .question-card{background:white;border-radius:28px;padding:clamp(20px,4vw,32px);box-shadow:var(--shadow-tactile);border-bottom:5px solid rgba(2,132,199,0.2);animation:slideUp 0.4s ease-out}
+    .q-number{display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent-light));color:white;font-weight:900;font-size:0.78rem;padding:4px 14px;border-radius:20px;margin-bottom:14px;box-shadow:0 3px 0 rgba(245,158,11,0.4)}
+    .q-image-wrap{position:relative;width:100%;aspect-ratio:16/9;border-radius:20px;overflow:hidden;margin-bottom:18px;background:linear-gradient(135deg,#E0F2FE,#FEF9C3);border:3px solid rgba(2,132,199,0.15)}
+    .q-image{width:100%;height:100%;object-fit:cover;display:block}
+    .q-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:96px;filter:drop-shadow(0 8px 16px rgba(0,0,0,0.2))}
+    .q-text{font-size:clamp(1.05rem,2.8vw,1.35rem);font-weight:800;color:var(--text-dark);line-height:1.5;margin-bottom:4px}
+    .options-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%}
+    .option-card{background:white;border-radius:var(--radius);padding:clamp(14px,3vw,20px);cursor:pointer;border:3px solid #E2E8F0;box-shadow:0 5px 0 rgba(0,0,0,0.06),0 10px 20px rgba(0,0,0,0.05);border-bottom:5px solid rgba(0,0,0,0.08);transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1);position:relative;overflow:hidden;display:flex;align-items:center;gap:12px}
+    .option-card:hover{transform:translateY(-3px);border-color:var(--primary-light);box-shadow:0 8px 0 rgba(0,0,0,0.06),0 14px 28px rgba(0,0,0,0.08)}
+    .option-card:active{transform:translateY(3px);border-bottom-width:2px;box-shadow:0 2px 0 rgba(0,0,0,0.06)}
+    .option-card.disabled{pointer-events:none}
+    .option-letter{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:0.9rem;color:white;flex-shrink:0;box-shadow:0 3px 0 rgba(0,0,0,0.15)}
+    .letter-a{background:linear-gradient(135deg,#6366F1,#818CF8)}
+    .letter-b{background:linear-gradient(135deg,#0284C7,#38BDF8)}
+    .letter-c{background:linear-gradient(135deg,#F59E0B,#FBBF24)}
+    .letter-d{background:linear-gradient(135deg,#10B981,#34D399)}
+    .option-text{font-weight:700;font-size:clamp(0.85rem,2.2vw,1rem);color:var(--text-dark);line-height:1.3}
+    .option-card.correct{border-color:var(--success);background:linear-gradient(135deg,#ECFDF5,#D1FAE5);animation:correctPulse 0.8s ease-out;box-shadow:0 0 0 4px rgba(16,185,129,0.2),0 8px 0 rgba(16,185,129,0.2)}
+    @keyframes correctPulse{0%{transform:scale(1)}30%{transform:scale(1.05)}60%{transform:scale(0.98)}100%{transform:scale(1)}}
+    .option-card.wrong{border-color:var(--danger);background:linear-gradient(135deg,#FEF2F2,#FEE2E2);animation:shakeError 0.5s ease-out}
+    @keyframes shakeError{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+    .option-card.show-correct{border-color:var(--success);background:linear-gradient(135deg,#ECFDF5,#D1FAE5)}
+    .explanation-toast{position:fixed;bottom:-200px;left:50%;transform:translateX(-50%);width:min(92%,600px);background:white;border-radius:24px;padding:20px 24px;box-shadow:0 12px 40px rgba(0,0,0,0.18),0 4px 0 rgba(0,0,0,0.05);border-bottom:5px solid rgba(16,185,129,0.3);z-index:100;animation:slideUpToast 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards}
+    .explanation-toast.hidden{display:none}
+    @keyframes slideUpToast{from{bottom:-200px;opacity:0}to{bottom:20px;opacity:1}}
+    .exp-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+    .exp-icon{font-size:28px}
+    .exp-title{font-weight:900;font-size:1rem;color:var(--success)}
+    .exp-body{font-size:clamp(0.85rem,2.2vw,0.95rem);color:var(--text-dark);line-height:1.6;font-weight:700}
+    .exp-close{margin-left:auto;background:#F1F5F9;border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 0 rgba(0,0,0,0.1);transition:all 0.15s}
+    .exp-close:hover{transform:scale(1.1)}
+    .exp-close:active{transform:scale(0.95)}
+    .results-card{background:white;border-radius:32px;padding:clamp(28px,5vw,48px);max-width:560px;width:100%;margin-top:clamp(20px,4vh,50px);box-shadow:var(--shadow-tactile);border-bottom:5px solid rgba(245,158,11,0.3);text-align:center;animation:slideUp 0.5s ease-out}
+    .results-score{font-size:clamp(3rem,8vw,5rem);font-weight:900;color:var(--accent);line-height:1}
+    .results-label{font-size:clamp(0.9rem,2.5vw,1.1rem);color:var(--text-muted);font-weight:700;margin-bottom:16px}
+    .results-stars{font-size:48px;margin:16px 0;letter-spacing:8px}
+    .results-stars .star-icon{display:inline-block;transition:all 0.4s}
+    .results-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:24px 0}
+    .stat-box{background:#F8FAFC;border-radius:16px;padding:14px 8px;box-shadow:0 3px 0 rgba(0,0,0,0.05)}
+    .stat-value{font-size:clamp(1.1rem,3vw,1.5rem);font-weight:900;color:var(--primary)}
+    .stat-label{font-size:0.72rem;font-weight:700;color:var(--text-muted);margin-top:2px}
+    .results-actions{display:flex;flex-direction:column;gap:12px;margin-top:20px}
+    .podium-section{width:100%;max-width:640px;margin-top:32px;animation:slideUp 0.6s ease-out}
+    .podium-title{font-size:clamp(1rem,3vw,1.3rem);font-weight:900;color:var(--text-dark);text-align:center;margin-bottom:20px;display:flex;align-items:center;justify-content:center;gap:8px}
+    .podium-container{display:flex;align-items:flex-end;justify-content:center;gap:8px;padding:0 8px}
+    .podium-place{display:flex;flex-direction:column;align-items:center;gap:8px}
+    .podium-avatar-row{display:flex;flex-direction:column;align-items:center;gap:4px}
+    .podium-avatar{font-size:40px;width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.15);border:3px solid white}
+    .podium-name{font-weight:800;font-size:0.78rem;color:var(--text-dark);max-width:100px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .podium-score{font-weight:900;font-size:0.85rem;color:var(--primary)}
+    .podium-base{width:110px;border-radius:12px 12px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:12px;box-shadow:0 6px 0 rgba(0,0,0,0.15);position:relative;overflow:hidden}
+    .podium-base.gold{height:160px;background:linear-gradient(180deg,#FCD34D,#F59E0B);border-bottom:5px solid rgba(180,130,0,0.4)}
+    .podium-base.silver{height:120px;background:linear-gradient(180deg,#E2E8F0,#94A3B8);border-bottom:5px solid rgba(100,116,139,0.4)}
+    .podium-base.bronze{height:90px;background:linear-gradient(180deg,#FED7AA,#D97706);border-bottom:5px solid rgba(180,100,0,0.4)}
+    .podium-medal{font-size:28px;margin-bottom:6px}
+    .podium-rank{font-size:0.7rem;font-weight:900;color:rgba(255,255,255,0.9)}
+    .podium-base.gold::before{content:'';position:absolute;top:0;left:-75%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent);animation:shimmerSweep 3s ease-in-out infinite}
+    @keyframes shimmerSweep{0%{left:-75%}100%{left:125%}}
+    .leaderboard-list{margin-top:24px;background:white;border-radius:20px;padding:16px;box-shadow:0 4px 0 rgba(0,0,0,0.05),0 8px 20px rgba(0,0,0,0.05)}
+    .lb-item{display:flex;align-items:center;gap:12px;padding:10px 8px;border-bottom:1px solid #F1F5F9}
+    .lb-item:last-child{border-bottom:none}
+    .lb-rank{font-weight:900;font-size:0.85rem;color:var(--text-muted);width:24px;text-align:center}
+    .lb-avatar{font-size:28px}
+    .lb-info{flex:1}
+    .lb-name{font-weight:800;font-size:0.9rem}
+    .lb-meta{font-size:0.72rem;color:var(--text-muted)}
+    .lb-score{font-weight:900;color:var(--accent);font-size:0.95rem}
+    .modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(15,23,42,0.55);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:16px}
+    .modal-overlay.active{display:flex}
+    .modal{background:white;border-radius:32px;width:100%;max-width:700px;max-height:90vh;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.25);animation:modalIn 0.35s cubic-bezier(0.34,1.56,0.64,1);display:flex;flex-direction:column}
+    @keyframes modalIn{from{opacity:0;transform:scale(0.9) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+    .modal-header{padding:20px 24px 16px;border-bottom:2px solid #F1F5F9;display:flex;align-items:center;justify-content:space-between}
+    .modal-title{font-size:clamp(1.1rem,3vw,1.4rem);font-weight:900;color:var(--primary)}
+    .modal-close{width:36px;height:36px;border-radius:50%;border:none;background:#F1F5F9;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 0 rgba(0,0,0,0.08);transition:all 0.15s}
+    .modal-close:hover{transform:scale(1.1);background:#E2E8F0}
+    .tabs-nav{display:flex;gap:0;background:#F8FAFC;border-bottom:2px solid #E2E8F0;padding:0 12px;position:relative;overflow-x:auto}
+    .tab-btn{flex:1;min-width:0;padding:12px 6px;border:none;background:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.72rem;color:var(--text-muted);display:flex;flex-direction:column;align-items:center;gap:4px;transition:color 0.2s;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap}
+    .tab-btn.active{color:var(--primary);border-bottom-color:var(--primary)}
+    .tab-btn:hover{color:var(--primary-light)}
+    .tab-icon{font-size:18px}
+    .tab-content{overflow-y:auto;flex:1;padding:20px}
+    .tab-panel{display:none}
+    .tab-panel.active{display:block;animation:fadeIn 0.3s}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    .qb-question{background:#F8FAFC;border-radius:16px;padding:16px;margin-bottom:16px;border:2px solid #E2E8F0;border-bottom:4px solid rgba(0,0,0,0.06)}
+    .qb-q-num{font-weight:900;font-size:0.8rem;color:var(--primary);margin-bottom:8px}
+    .qb-field{margin-bottom:10px}
+    .qb-field label{display:block;font-weight:800;font-size:0.8rem;color:var(--text-muted);margin-bottom:4px}
+    .qb-field input,.qb-field textarea{width:100%;padding:10px 14px;border:2px solid #E2E8F0;border-radius:12px;font-family:'Nunito',sans-serif;font-size:0.9rem;font-weight:700;background:white;transition:border-color 0.2s}
+    .qb-field input:focus,.qb-field textarea:focus{outline:none;border-color:var(--primary)}
+    .qb-field textarea{resize:vertical;min-height:60px}
+    .qb-preview-img{width:100%;max-height:160px;object-fit:cover;border-radius:12px;margin-top:6px;display:none;background:#F1F5F9}
+    .qb-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .qb-opt-row{display:flex;align-items:center;gap:8px}
+    .qb-opt-row input[type="radio"]{width:18px;height:18px;accent-color:var(--success);cursor:pointer}
+    .qb-opt-row input[type="text"]{flex:1}
+    .qb-remove-btn{background:var(--danger);color:white;border:none;border-radius:8px;padding:4px 10px;font-size:0.75rem;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif}
+    .add-q-btn{width:100%;padding:12px;border:2px dashed #CBD5E1;border-radius:12px;background:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.9rem;color:var(--text-muted);transition:all 0.2s}
+    .add-q-btn:hover{border-color:var(--primary);color:var(--primary);background:#EFF6FF}
+    .student-item{display:flex;align-items:center;gap:12px;padding:12px;background:#F8FAFC;border-radius:14px;margin-bottom:10px;border-bottom:3px solid rgba(0,0,0,0.05)}
+    .student-avatar-select{font-size:32px;cursor:pointer}
+    .student-name-input{flex:1;padding:8px 12px;border:2px solid #E2E8F0;border-radius:10px;font-family:'Nunito';font-weight:700;font-size:0.9rem}
+    .student-name-input:focus{outline:none;border-color:var(--primary)}
+    .del-btn{background:var(--danger);color:white;border:none;border-radius:10px;padding:8px 12px;font-weight:800;font-size:0.8rem;cursor:pointer;font-family:'Nunito'}
+    .add-student-btn{width:100%;padding:12px;border:2px dashed #CBD5E1;border-radius:12px;background:none;cursor:pointer;font-family:'Nunito';font-weight:800;font-size:0.9rem;color:var(--text-muted)}
+    .add-student-btn:hover{border-color:var(--primary);color:var(--primary)}
+    .setting-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #F1F5F9}
+    .setting-label{font-weight:800;font-size:0.9rem}
+    .setting-control select,.setting-control input[type="number"]{padding:8px 12px;border:2px solid #E2E8F0;border-radius:10px;font-family:'Nunito';font-weight:700;font-size:0.85rem;background:white}
+    .toggle-switch{position:relative;width:52px;height:28px;background:#CBD5E1;border-radius:14px;cursor:pointer;transition:background 0.3s}
+    .toggle-switch.on{background:var(--success)}
+    .toggle-switch::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:white;box-shadow:0 2px 4px rgba(0,0,0,0.2);transition:transform 0.3s}
+    .toggle-switch.on::after{transform:translateX(24px)}
+    .score-table{width:100%;border-collapse:collapse;font-size:0.85rem}
+    .score-table th{background:var(--primary);color:white;padding:10px 8px;text-align:center;font-weight:800}
+    .score-table th:first-child{border-radius:10px 0 0 0}
+    .score-table th:last-child{border-radius:0 10px 0 0}
+    .score-table td{padding:10px 8px;text-align:center;border-bottom:1px solid #F1F5F9;font-weight:700}
+    .score-table tr:hover td{background:#F8FAFC}
+    .clear-scores-btn{width:100%;margin-top:16px;padding:12px;border:2px solid var(--danger);border-radius:12px;background:none;color:var(--danger);font-family:'Nunito';font-weight:800;font-size:0.9rem;cursor:pointer}
+    .clear-scores-btn:hover{background:#FEF2F2}
+    .gs-field{margin-bottom:14px}
+    .gs-field label{display:block;font-weight:800;font-size:0.85rem;margin-bottom:6px;color:var(--text-muted)}
+    .gs-field input{width:100%;padding:10px 14px;border:2px solid #E2E8F0;border-radius:12px;font-family:'Nunito';font-weight:700;font-size:0.85rem}
+    .gs-field input:focus{outline:none;border-color:var(--primary)}
+    .gs-btns{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+    .gs-btn{flex:1;min-width:120px;padding:12px;border-radius:12px;border:none;cursor:pointer;font-family:'Nunito';font-weight:800;font-size:0.85rem;transition:all 0.15s}
+    .gs-btn.fetch{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:white;box-shadow:0 4px 0 rgba(2,132,199,0.3)}
+    .gs-btn.push{background:linear-gradient(135deg,var(--success),var(--success-light));color:white;box-shadow:0 4px 0 rgba(16,185,129,0.3)}
+    .gs-btn.push-q{background:linear-gradient(135deg,var(--accent),var(--accent-light));color:white;box-shadow:0 4px 0 rgba(245,158,11,0.3)}
+    .gs-btn:hover{transform:translateY(-2px)}
+    .gs-btn:active{transform:translateY(2px);box-shadow:none}
+    .gs-status{margin-top:10px;font-size:0.8rem;font-weight:700;color:var(--text-muted);word-break:break-all}
+    .backup-btns{display:flex;flex-direction:column;gap:12px}
+    .bk-btn{padding:14px 20px;border-radius:14px;border:none;cursor:pointer;font-family:'Nunito';font-weight:800;font-size:0.9rem;transition:all 0.15s;display:flex;align-items:center;gap:10px}
+    .bk-btn.export{background:linear-gradient(135deg,#8B5CF6,#A78BFA);color:white;box-shadow:0 4px 0 rgba(139,92,246,0.3)}
+    .bk-btn.import{background:linear-gradient(135deg,var(--accent),var(--accent-light));color:white;box-shadow:0 4px 0 rgba(245,158,11,0.3)}
+    .bk-btn.download-html{background:linear-gradient(135deg,var(--text-dark),#334155);color:white;box-shadow:0 4px 0 rgba(0,0,0,0.2)}
+    .bk-btn:hover{transform:translateY(-2px)}
+    .bk-btn:active{transform:translateY(2px);box-shadow:none}
+    #confetti-canvas{position:fixed;inset:0;z-index:300;pointer-events:none}
+    .flying-star{position:fixed;z-index:250;font-size:28px;pointer-events:none;animation:flyStar 0.8s cubic-bezier(0.25,0.46,0.45,0.94) forwards}
+    @keyframes flyStar{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(0.3)}}
+    @media(max-width:480px){.options-grid{grid-template-columns:1fr}.hud{padding:8px 12px}.podium-base.gold{width:90px;height:130px}.podium-base.silver{width:80px;height:100px}.podium-base.bronze{width:80px;height:75px}.tab-btn{font-size:0.65rem;padding:10px 4px}.tab-icon{font-size:16px}.gs-btns{flex-direction:column}}
+    .hidden{display:none!important}
+    .mt-12{margin-top:12px}
+    .mt-20{margin-top:20px}
+  </style>
+</head>
+<body>
+  <div class="wave-bg"></div>
+  <div class="stars" id="stars"></div>
+  <canvas id="confetti-canvas"></canvas>
+  <div class="countdown-bar-wrap" id="countdownBarWrap"><div class="countdown-bar" id="countdownBar"></div></div>
+
+  <!-- LOGIN SCREEN -->
+  <div class="screen active" id="loginScreen">
+    <div class="login-card">
+      <span class="login-icon">🌌</span>
+      <h1 class="login-title">Thiên Văn Học</h1>
+      <p class="login-sub">Hệ Mặt Trời & Vũ Trụ Bao La<br>Hãy nhập tên và chọn avatar để bắt đầu!</p>
+      <div class="form-group">
+        <label class="form-label">Tên của bé 🧑‍🚀</label>
+        <input type="text" class="form-input" id="playerName" placeholder="Nhập tên bạn nhé..." maxlength="20" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Chọn avatar ⭐</label>
+        <div class="avatar-grid" id="avatarGrid"></div>
+      </div>
+      <button class="btn-primary" id="startBtn">🚀 Bắt Đầu Khám Phá</button>
+      <div class="mt-12">
+        <button class="btn-secondary" id="adminBtn" style="width:100%">⚙️ Quản Trị</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div class="screen" id="gameScreen">
+    <div class="hud" id="hud">
+      <div class="hud-left">
+        <span class="hud-avatar" id="hudAvatar">🧑‍🚀</span>
+        <span class="hud-name" id="hudName">Học sinh</span>
+      </div>
+      <div class="hud-center">
+        <div class="hud-stars" id="hudStars"></div>
+        <span class="hud-progress-text" id="hudProgress">Câu 1 / 5</span>
+      </div>
+      <div class="hud-right">
+        <div class="combo-badge" id="comboBadge">🔥 COMBO x<span id="comboCount">0</span></div>
+        <button class="hud-btn" id="soundBtn" title="Bật/Tắt âm thanh">🔊</button>
+        <button class="hud-btn" id="settingsBtn" title="Quản trị">⚙️</button>
+      </div>
+    </div>
+    <div class="game-stage" id="gameStage"></div>
+    <div class="explanation-toast hidden" id="explanationToast">
+      <div class="exp-header">
+        <span class="exp-icon">💡</span>
+        <span class="exp-title">Bé Có Biết:</span>
+        <button class="exp-close" id="expClose">✕</button>
+      </div>
+      <div class="exp-body" id="expBody"></div>
+    </div>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div class="screen" id="resultsScreen">
+    <div class="results-card">
+      <span style="font-size:64px;display:block;margin-bottom:12px">🏆</span>
+      <h2 class="login-title" style="margin-bottom:4px">Hoàn Thành!</h2>
+      <p class="results-label">Kết quả trò chơi của bé</p>
+      <div class="results-score" id="resultsScore">0</div>
+      <div class="results-label">điểm</div>
+      <div class="results-stars" id="resultsStars"></div>
+      <div class="results-stats">
+        <div class="stat-box"><div class="stat-value" id="statCorrect">0</div><div class="stat-label">Đúng</div></div>
+        <div class="stat-box"><div class="stat-value" id="statCombo">0</div><div class="stat-label">Combo tối đa</div></div>
+        <div class="stat-box"><div class="stat-value" id="statTime">0s</div><div class="stat-label">Thời gian</div></div>
+      </div>
+      <div class="results-actions">
+        <button class="btn-primary" id="retryBtn">🔄 Chơi Lại</button>
+        <button class="btn-secondary" id="backToLibraryBtn" style="width:100%">📚 Quay lại thư viện</button>
+      </div>
+    </div>
+    <div class="podium-section" id="podiumSection">
+      <div class="podium-title">🏅 Bảng Xếp Hạng</div>
+      <div class="podium-container" id="podiumContainer"></div>
+      <div class="leaderboard-list" id="leaderboardList"></div>
+    </div>
+  </div>
+
+  <!-- ADMIN MODAL -->
+  <div class="modal-overlay" id="adminModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">⚙️ Quản Trị</h2>
+        <button class="modal-close" id="modalClose">✕</button>
+      </div>
+      <nav class="tabs-nav" id="tabsNav">
+        <button class="tab-btn active" data-tab="tab-questions"><span class="tab-icon">❓</span>Câu hỏi</button>
+        <button class="tab-btn" data-tab="tab-students"><span class="tab-icon">👨‍👩‍👧</span>Lớp học</button>
+        <button class="tab-btn" data-tab="tab-settings"><span class="tab-icon">🎯</span>Cài đặt</button>
+        <button class="tab-btn" data-tab="tab-scores"><span class="tab-icon">🏆</span>Bảng điểm</button>
+        <button class="tab-btn" data-tab="tab-sheet"><span class="tab-icon">🌐</span>Google Sheet</button>
+        <button class="tab-btn" data-tab="tab-backup"><span class="tab-icon">💾</span>Sao lưu</button>
+      </nav>
+      <div class="tab-content">
+        <div class="tab-panel active" id="tab-questions"></div>
+        <div class="tab-panel" id="tab-students"></div>
+        <div class="tab-panel" id="tab-settings">
+          <div class="setting-row"><span class="setting-label">Số câu hỏi</span><div class="setting-control"><select id="settingQCount"><option value="3">3</option><option value="5" selected>5</option><option value="10">10</option></select></div></div>
+          <div class="setting-row"><span class="setting-label">Bật đếm ngược</span><div class="setting-control"><div class="toggle-switch on" id="toggleTimer"></div></div></div>
+          <div class="setting-row"><span class="setting-label">Thời gian / câu</span><div class="setting-control"><select id="settingTimerSec"><option value="15">15 giây</option><option value="30" selected>30 giây</option><option value="60">60 giây</option></select></div></div>
+          <div class="setting-row"><span class="setting-label">Tên bài học</span><div class="setting-control"><input type="text" id="settingGameName" value="Thiên Văn Học" style="padding:8px 12px;border:2px solid #E2E8F0;border-radius:10px;font-family:'Nunito';font-weight:700;font-size:0.85rem;width:180px"></div></div>
+          <button class="btn-primary mt-12" id="saveSettingsBtn" style="width:auto;padding:12px 32px">💾 Lưu Cài Đặt</button>
+        </div>
+        <div class="tab-panel" id="tab-scores">
+          <table class="score-table">
+            <thead><tr><th>#</th><th>Avatar</th><th>Tên</th><th>Điểm</th><th>Sao</th><th>Ngày</th></tr></thead>
+            <tbody id="scoresBody"></tbody>
+          </table>
+          <button class="clear-scores-btn" id="clearScoresBtn">🗑 Xóa Tất Cả Điểm</button>
+        </div>
+        <div class="tab-panel" id="tab-sheet">
+          <div class="gs-field">
+            <label>Link Google Apps Script Web App</label>
+            <input type="url" id="gsUrl" placeholder="https://script.google.com/macros/s/.../exec">
+          </div>
+          <div class="gs-btns">
+            <button class="gs-btn fetch" id="gsFetchBtn">📥 Tải từ Sheet</button>
+            <button class="gs-btn push" id="gsPushBtn">📤 Đẩy điểm lên</button>
+            <button class="gs-btn push-q" id="gsPushQBtn">📤 Đẩy câu hỏi</button>
+          </div>
+          <div class="gs-status" id="gsStatus">➡️ Đã kết nối Google Sheet thành công!</div>
+        </div>
+        <div class="tab-panel" id="tab-backup">
+          <div class="backup-btns">
+            <button class="bk-btn export" id="exportJsonBtn">📤 Xuất JSON (Sao lưu)</button>
+            <button class="bk-btn import" id="importJsonBtn">📥 Nhập JSON (Khôi phục)</button>
+            <button class="bk-btn download-html" id="downloadHtmlBtn">📥 Tải HTML (Chép USB)</button>
+          </div>
+          <input type="file" id="importFileInput" accept=".json" style="display:none">
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+// ============================================================
+// THIÊN VĂN HỌC GAME ENGINE v2.0 - GOOGLE SHEETS INTEGRATED
+// Link Google Apps Script: https://script.google.com/macros/s/AKfycbyLIj5EYQPmUEft0Jmu1kuas2Bb_QgtJYaSS3jwELLnBoEsGxHKyuIhU-bjDufFYuFbzg/exec
+// ============================================================
+
+var DEFAULT_QUESTIONS = [
+  { id:1, question:"Hành tinh nào lớn nhất trong Hệ Mặt Trời?", image:"https://i.pinimg.com/originals/2e/e4/aa/2ee4aa3f694ef60be77e0720a16127ab.jpg", options:["Sao Mộc (Jupiter)","Sao Kim (Venus)","Sao Thổ (Saturn)","Sao Hải Vương (Neptune)"], correct:0, explanation:"Sao Mộc là hành tinh lớn nhất Hệ Mặt Trời, đường kính gấp 11 lần Trái Đất. Nó có khối lượng lớn hơn tất cả các hành tinh khác cộng lại 2,5 lần!" },
+  { id:2, question:"Hành tinh đỏ thứ tư tính từ Mặt Trời có tên là gì?", image:"https://i.pinimg.com/originals/5d/a7/76/5da776c4ae6e09d9dc1a76d2e0e1b3a9.jpg", options:["Sao Kim (Venus)","Sao Hỏa (Mars)","Sao Thủy (Mercury)","Sao Mộc (Jupiter)"], correct:1, explanation:"Sao Hỏa được gọi là Hành tinh Đỏ vì bề mặt chứa nhiều oxit sắt (gỉ sắt). NASA đã gửi robot Curiosity khảo sát Sao Hỏa." },
+  { id:3, question:"Hiện tượng Mặt Trăng đi vào giữa Trái Đất và Mặt Trời gọi là gì?", image:"https://i.pinimg.com/originals/c8/8a/31/c88a31f476b99de3e74e1f78c1f1f8e8.jpg", options:["Nguyệt thực","Trăng tròn","Nhật thực","Sao băng"], correct:2, explanation:"Nhật thực xảy ra khi Mặt Trăng di chuyển ngang qua giữa Trái Đất và Mặt Trời, che khuất ánh sáng Mặt Trời." },
+  { id:4, question:"Vệ tinh tự nhiên duy nhất của Trái Đất là gì?", image:"https://i.pinimg.com/originals/f8/3e/c6/f83ec69d5e73a30a9e2b12c94a6e8f11.jpg", options:["Sao Hỏa","Mặt Trăng (Moon)","Europa","Titan"], correct:1, explanation:"Mặt Trăng là vệ tinh tự nhiên duy nhất của Trái Đất, cách chúng ta khoảng 384.400 km. Nó luôn quay cùng một phía về phía Trái Đất." },
+  { id:5, question:"Thiên hà chứa Hệ Mặt Trời của chúng ta có tên gọi là gì?", image:"https://i.pinimg.com/originals/a1/b2/c3/a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6.jpg", options:["Andromeda","Tiến Cloud","Dải Ngân Hà (Milky Way)","Tam Giác"], correct:2, explanation:"Dải Ngân Hà là thiên hà xoắn ốc chứa khoảng 100-400 tỷ ngôi sao, đường kính khoảng 100.000 năm ánh sáng." }
+];
+
+var FALLBACK_EMOJIS = ['🪐','🔴','🌑','🌙','🌌'];
+var FALLBACK_GRADIENTS = [
+  'linear-gradient(135deg, #1a1a2e, #16213e, #0f3460)',
+  'linear-gradient(135deg, #b91c1c, #dc2626, #f87171)',
+  'linear-gradient(135deg, #1e293b, #334155, #475569)',
+  'linear-gradient(135deg, #f5f5f4, #d6d3d1, #a8a29e)',
+  'linear-gradient(135deg, #0f172a, #1e1b4b, #312e81)'
+];
+var AVATARS = ['🧑‍🚀','👩‍🚀','🧒‍🚀','👨‍🔬','👩‍🔬','🦸','🦸‍♀️','🤖','🐱','🦊','🐼','🦁'];
+
+var state = { playerName:'', playerAvatar:'🧑‍🚀', questions:[], currentIndex:0, score:0, stars:0, combo:0, maxCombo:0, correctCount:0, startTime:null, timerEnabled:true, timerSeconds:30, soundEnabled:true, gameStarted:false };
+var countdownInterval = null;
+var audioCtx = null;
+
+// *** GOOGLE SHEETS LINK - ĐÃ TÍCH HỢP ***
+var GS_URL = localStorage.getItem('tianVanGSUrl') || 'https://script.google.com/macros/s/AKfycbyLIj5EYQPmUEft0Jmu1kuas2Bb_QgtJYaSS3jwELLnBoEsGxHKyuIhU-bjDufFYuFbzg/exec';
+
+// ========== LOCAL STORAGE ==========
+function getLS(k, f) { try { return JSON.parse(localStorage.getItem(k)) ?? f; } catch(e) { return f; } }
+function setLS(k, v) { localStorage.setItem(k, JSON.stringify(v)); }
+
+// ========== AUDIO ENGINE ==========
+function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === 'suspended') audioCtx.resume(); }
+function playTone(freq, dur, type, vol) {
+  if (!state.soundEnabled || !audioCtx) return;
+  var osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+  osc.type = type || 'sine'; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+  gain.gain.setValueAtTime(vol || 0.15, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + (dur || 0.2));
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(); osc.stop(audioCtx.currentTime + (dur || 0.2));
+}
+function playCorrectSound() { [523.25,659.25,783.99,1046.50].forEach(function(f,i) { setTimeout(function(){playTone(f,0.2,'sine',0.12);}, i*80); }); }
+function playWrongSound() { playTone(110,0.4,'sawtooth',0.1); setTimeout(function(){playTone(98,0.3,'sawtooth',0.08);},150); }
+function playTickSound() { playTone(800,0.08,'square',0.06); }
+function playFanfare() { [523.25,659.25,783.99,1046.50,783.99,1046.50,1318.51].forEach(function(f,i) { setTimeout(function(){playTone(f,0.25,'sine',0.12);}, i*120); }); }
+var bgmInt = null;
+function startBGM() {
+  if (!state.soundEnabled || !audioCtx) return; stopBGM();
+  var melody = [262,294,330,392,440,392,330,294]; var idx=0;
+  bgmInt = setInterval(function() { if (!state.soundEnabled||!audioCtx||!state.gameStarted) return; playTone(melody[idx%melody.length],0.3,'sine',0.04); idx++; }, 400);
+}
+function stopBGM() { if (bgmInt) { clearInterval(bgmInt); bgmInt=null; } }
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  var u = new SpeechSynthesisUtterance(text);
+  u.lang = 'vi-VN'; u.rate = 0.9; u.pitch = 1.05;
+  var voices = window.speechSynthesis.getVoices();
+  var vi = voices.find(function(v) { return v.lang.startsWith('vi'); });
+  if (vi) u.voice = vi;
+  window.speechSynthesis.speak(u);
+}
+
+// ========== EFFECTS ==========
+function spawnConfetti() {
+  var canvas = document.getElementById('confetti-canvas');
+  var ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  var colors = ['#0284C7','#F59E0B','#10B981','#EF4444','#8B5CF6','#EC4899','#38BDF8','#FBBF24'];
+  var pieces = [];
+  for (var i=0; i<120; i++) {
+    pieces.push({ x:canvas.width/2+(Math.random()-0.5)*200, y:canvas.height/2, vx:(Math.random()-0.5)*16, vy:Math.random()*-18-4, w:Math.random()*10+5, h:Math.random()*6+3, color:colors[Math.floor(Math.random()*colors.length)], rot:Math.random()*360, rotSp:(Math.random()-0.5)*12, grav:0.4, life:1 });
+  }
+  function animate() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    var alive = false;
+    pieces.forEach(function(p) {
+      if (p.life<=0) return; alive=true;
+      p.x+=p.vx; p.vy+=p.grav; p.y+=p.vy; p.rot+=p.rotSp; p.life-=0.008;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate((p.rot*Math.PI)/180);
+      ctx.globalAlpha=p.life; ctx.fillStyle=p.color;
+      ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore();
+    });
+    if (alive) requestAnimationFrame(animate);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  animate();
+}
+function spawnFlyingStars(fromEl) {
+  var rect = fromEl.getBoundingClientRect();
+  var cx = rect.left+rect.width/2, cy = rect.top;
+  for (var i=0; i<3; i++) {
+    var el = document.createElement('div'); el.className='flying-star'; el.textContent='⭐';
+    el.style.left=cx+(Math.random()-0.5)*40+'px'; el.style.top=cy+'px';
+    el.style.setProperty('--dx',(Math.random()-0.5)*120+'px');
+    el.style.setProperty('--dy',-(Math.random()*100+80)+'px');
+    document.body.appendChild(el); setTimeout(function(){el.remove();},900);
+  }
+}
+function createStars() {
+  var c = document.getElementById('stars');
+  var emojis=['✨','⭐','🌟','💫'];
+  for (var i=0; i<15; i++) {
+    var s=document.createElement('span'); s.className='star'; s.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    s.style.left=Math.random()*100+'%'; s.style.top=Math.random()*100+'%';
+    s.style.animationDelay=Math.random()*3+'s'; s.style.fontSize=(14+Math.random()*16)+'px';
+    c.appendChild(s);
+  }
+}
+createStars();
+
+// ========== AVATAR PICKER ==========
+function renderAvatarPicker() {
+  var grid=document.getElementById('avatarGrid'); grid.innerHTML='';
+  AVATARS.forEach(function(av,i){
+    var btn=document.createElement('button'); btn.className='avatar-opt'+(i===0?' selected':''); btn.textContent=av;
+    btn.addEventListener('click',function(){ grid.querySelectorAll('.avatar-opt').forEach(function(b){b.classList.remove('selected');}); btn.classList.add('selected'); state.playerAvatar=av; });
+    grid.appendChild(btn);
+  });
+}
+renderAvatarPicker();
+
+// ========== SCREEN MANAGEMENT ==========
+function showScreen(id) { document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');}); document.getElementById(id).classList.add('active'); }
+
+// ========== HUD ==========
+function updateHUD() {
+  document.getElementById('hudAvatar').textContent=state.playerAvatar;
+  document.getElementById('hudName').textContent=state.playerName||'Hoc sinh';
+  document.getElementById('hudProgress').textContent='Cau '+(state.currentIndex+1)+' / '+state.questions.length;
+  renderHUDStars();
+  var badge = document.getElementById('comboBadge');
+  if (state.combo >= 2) { badge.classList.add('active'); document.getElementById('comboCount').textContent=state.combo; }
+  else { badge.classList.remove('active'); }
+}
+function renderHUDStars() {
+  var container = document.getElementById('hudStars'); container.innerHTML='';
+  for (var i=0; i<state.questions.length; i++) {
+    var star = document.createElement('span');
+    star.className = 'hud-star' + (i < state.stars ? ' earned' : ' empty');
+    star.textContent = '⭐';
+    container.appendChild(star);
+  }
+}
+
+// ========== COUNTDOWN ==========
+function startCountdown(seconds, onTimeout) {
+  stopCountdown();
+  if (!state.timerEnabled) { document.getElementById('countdownBarWrap').classList.remove('active'); return; }
+  var bar = document.getElementById('countdownBar');
+  var wrap = document.getElementById('countdownBarWrap');
+  wrap.classList.add('active');
+  var remaining = seconds * 1000;
+  var total = seconds * 1000;
+  bar.style.width = '100%';
+  bar.className = 'countdown-bar';
+  countdownInterval = setInterval(function() {
+    remaining -= 100;
+    var pct = Math.max(0, (remaining / total) * 100);
+    bar.style.width = pct + '%';
+    if (pct > 50) bar.className = 'countdown-bar';
+    else if (pct > 20) bar.className = 'countdown-bar warning';
+    else bar.className = 'countdown-bar danger';
+    if (remaining <= 5000 && remaining > 4900) playTickSound();
+    if (remaining <= 0) { stopCountdown(); onTimeout(); }
+  }, 100);
+}
+function stopCountdown() {
+  if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+  document.getElementById('countdownBarWrap').classList.remove('active');
+  document.getElementById('countdownBar').style.width = '100%';
+  document.getElementById('countdownBar').className = 'countdown-bar';
+}
+
+// ========== RENDER QUESTION ==========
+function renderQuestion() {
+  var q = state.questions[state.currentIndex];
+  if (!q) { endGame(); return; }
+  var stage = document.getElementById('gameStage');
+  var letters = ['A','B','C','D'];
+  var letterClasses = ['letter-a','letter-b','letter-c','letter-d'];
+  var bgIdx = state.currentIndex % FALLBACK_GRADIENTS.length;
+  var imgHTML = '';
+  if (q.image) {
+    imgHTML = '<img class="q-image" src="'+q.image+'" alt="Minh hoa" loading="lazy" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\'"><div class="q-fallback" style="display:none;background:'+FALLBACK_GRADIENTS[bgIdx]+'">'+FALLBACK_EMOJIS[bgIdx]+'</div>';
+  } else {
+    imgHTML = '<div class="q-fallback" style="background:'+FALLBACK_GRADIENTS[bgIdx]+'">'+FALLBACK_EMOJIS[bgIdx]+'</div>';
+  }
+  var optionsHTML = q.options.map(function(opt, i) {
+    return '<div class="option-card" data-index="'+i+'" onclick="selectAnswer('+i+', this)"><span class="option-letter '+letterClasses[i]+'">'+letters[i]+'</span><span class="option-text">'+opt+'</span></div>';
+  }).join('');
+  stage.innerHTML = '<div class="question-card"><span class="q-number">Câu hỏi '+(state.currentIndex+1)+'</span><div class="q-image-wrap" id="qImageWrap">'+imgHTML+'</div><h2 class="q-text">'+q.question+'</h2></div><div class="options-grid" id="optionsGrid">'+optionsHTML+'</div>';
+  updateHUD();
+  if (state.soundEnabled) setTimeout(function(){speak(q.question);}, 400);
+  if (state.timerEnabled) startCountdown(state.timerSeconds, function(){handleTimeout();});
+}
+
+// ========== SELECT ANSWER ==========
+function selectAnswer(idx, el) {
+  if (!state.gameStarted) return;
+  var q = state.questions[state.currentIndex];
+  var cards = document.querySelectorAll('.option-card');
+  cards.forEach(function(c) { c.classList.add('disabled'); });
+  stopCountdown();
+  if (idx === q.correct) {
+    el.classList.add('correct');
+    state.score += 10 + (state.combo * 2);
+    state.stars++;
+    state.combo++;
+    if (state.combo > state.maxCombo) state.maxCombo = state.combo;
+    state.correctCount++;
+    playCorrectSound();
+    spawnConfetti();
+    spawnFlyingStars(el);
+    setTimeout(function(){renderHUDStars();}, 300);
+  } else {
+    el.classList.add('wrong');
+    state.combo = 0;
+    playWrongSound();
+    setTimeout(function(){cards[q.correct].classList.add('show-correct');}, 600);
+  }
+  updateHUD();
+  setTimeout(function(){showExplanation(q.explanation);}, 900);
+}
+function handleTimeout() {
+  playWrongSound();
+  var q = state.questions[state.currentIndex];
+  var cards = document.querySelectorAll('.option-card');
+  cards.forEach(function(c) { c.classList.add('disabled'); });
+  cards[q.correct].classList.add('show-correct');
+  state.combo = 0;
+  updateHUD();
+  setTimeout(function(){showExplanation(q.explanation);}, 800);
+}
+function showExplanation(text) {
+  var toast = document.getElementById('explanationToast');
+  document.getElementById('expBody').textContent = text;
+  toast.classList.remove('hidden');
+  if (state.soundEnabled) setTimeout(function(){speak('Be co biet: ' + text);}, 300);
+  setTimeout(function(){toast.classList.add('hidden'); nextQuestion();}, 5000);
+}
+document.getElementById('expClose').addEventListener('click', function() { document.getElementById('explanationToast').classList.add('hidden'); nextQuestion(); });
+function nextQuestion() {
+  state.currentIndex++;
+  if (state.currentIndex >= state.questions.length) { endGame(); }
+  else {
+    var stage = document.getElementById('gameStage');
+    stage.style.opacity = '0'; stage.style.transform = 'translateY(20px)'; stage.style.transition = 'all 0.3s';
+    setTimeout(function(){ renderQuestion(); stage.style.opacity = '1'; stage.style.transform = 'translateY(0)'; }, 300);
+  }
+}
+
+// ========== END GAME ==========
+function endGame() {
+  stopCountdown(); stopBGM();
+  state.gameStarted = false;
+  var elapsed = state.startTime ? Math.round((Date.now() - state.startTime) / 1000) : 0;
+  document.getElementById('resultsScore').textContent = state.score;
+  document.getElementById('statCorrect').textContent = state.correctCount+'/'+state.questions.length;
+  document.getElementById('statCombo').textContent = state.maxCombo;
+  document.getElementById('statTime').textContent = elapsed+'s';
+  var starsContainer = document.getElementById('resultsStars'); starsContainer.innerHTML = '';
+  for (var i=0; i<state.questions.length; i++) {
+    var span = document.createElement('span'); span.className = 'star-icon';
+    span.textContent = i < state.stars ? '⭐' : '☆';
+    span.style.opacity = i < state.stars ? '1' : '0.25';
+    span.style.transform = i < state.stars ? 'scale(1)' : 'scale(0.8)';
+    starsContainer.appendChild(span);
+  }
+  saveScore(state.score, state.stars, elapsed);
+  renderPodium();
+  playFanfare();
+  setTimeout(function(){spawnConfetti();}, 400);
+  showScreen('resultsScreen');
+}
+
+// ========== SCORE STORAGE ==========
+function saveScore(score, stars, time) {
+  var scores = getLS('tianVanScores', []);
+  scores.push({ name: state.playerName, avatar: state.playerAvatar, score: score, stars: stars, combo: state.maxCombo, time: time, date: new Date().toLocaleDateString('vi-VN') });
+  scores.sort(function(a,b){return b.score-a.score;});
+  setLS('tianVanScores', scores.slice(0, 50));
+}
+function getScores() { return getLS('tianVanScores', []); }
+
+// ========== PODIUM ==========
+function renderPodium() {
+  var scores = getScores();
+  var top3 = scores.slice(0, 3);
+  var container = document.getElementById('podiumContainer');
+  var list = document.getElementById('leaderboardList');
+  if (top3.length === 0) {
+    container.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:20px;">Chua co bang xep hang</p>';
+    list.innerHTML = '';
+    return;
+  }
+  var order = [1, 0, 2];
+  var classes = ['silver', 'gold', 'bronze'];
+  var medals = ['🥈', '🥇', '🥉'];
+  var ranks = ['2', '1', '3'];
+  container.innerHTML = order.map(function(i, pos) {
+    var s = top3[i];
+    if (!s) return '<div class="podium-place" style="visibility:hidden"></div>';
+    return '<div class="podium-place"><div class="podium-avatar-row"><div class="podium-avatar" style="background:#F8FAFC">'+s.avatar+'</div><div class="podium-name">'+s.name+'</div><div class="podium-score">'+s.score+' đ</div></div><div class="podium-base '+classes[pos]+'"><span class="podium-medal">'+medals[pos]+'</span><span class="podium-rank">TOP '+ranks[pos]+'</span></div></div>';
+  }).join('');
+  list.innerHTML = scores.slice(0, 10).map(function(s, i) {
+    return '<div class="lb-item"><span class="lb-rank">#'+(i+1)+'</span><span class="lb-avatar">'+s.avatar+'</span><div class="lb-info"><div class="lb-name">'+s.name+'</div><div class="lb-meta">⭐'+s.stars+' · 🔥'+(s.combo||0)+' · 🕐'+s.time+'s</div></div><span class="lb-score">'+s.score+'đ</span></div>';
+  }).join('');
+}
+
+// ========== GOOGLE SHEETS INTEGRATION (FIXED) ==========
+async function gsFetch() {
+  if (!GS_URL) { alert('Vui lòng dán link Google Apps Script trước!'); return; }
+  var status = document.getElementById('gsStatus');
+  status.textContent = 'Đang tải...';
+  try {
+    var res = await fetch(GS_URL + '?action=fetch');
+    var data = await res.json();
+    if (data.success) {
+      if (data.questions && data.questions.length) {
+        state.questions = data.questions.map(function(q) {
+          return {
+            id: Number(q['STT'] || q.id || 0),
+            question: String(q['Câu hỏi'] || q.question || ''),
+            image: String(q['Ảnh_URL'] || q.image || ''),
+            options: [String(q['Đáp_án_A'] || q.options?.[0] || ''), String(q['Đáp_án_B'] || q.options?.[1] || ''), String(q['Đáp_án_C'] || q.options?.[2] || ''), String(q['Đáp_án_D'] || q.options?.[3] || '')],
+            correct: Math.max(0, Math.min(3, Number(q['Đúng'] || q.correct || 1) - 1)),
+            explanation: String(q['Giải_thích'] || q.explanation || '')
+          };
+        });
+        setLS('tianVanQuestions', state.questions);
+        status.textContent = '✅ Đã tải ' + state.questions.length + ' câu hỏi!';
+        renderQuestionBank();
+      }
+      if (data.scores) { setLS('tianVanScores', data.scores); renderScores(); renderPodium(); }
+      if (data.students) { setLS('tianVanStudents', data.students); renderStudents(); }
+      if (data.settings) {
+        var s = {};
+        data.settings.forEach(function(item) { s[item.Key] = item.Value; });
+        setLS('tianVanSettings', s);
+        loadSettings();
+      }
+    } else { status.textContent = '❌ Lỗi: ' + (data.error || 'Không biết'); }
+  } catch (e) { status.textContent = '❌ Lỗi kết nối: ' + e.message; }
+}
+
+async function gsPush() {
+  if (!GS_URL) { alert('Vui lòng dán link Google Apps Script trước!'); return; }
+  var scores = getScores();
+  var status = document.getElementById('gsStatus');
+  status.textContent = 'Đang đẩy...';
+  try {
+    await fetch(GS_URL, { method:'POST', body:JSON.stringify({ action:'push_scores', scores:scores }) });
+    status.textContent = '✅ Đã đẩy ' + scores.length + ' bản ghi lên Google Sheet!';
+  } catch (e) { status.textContent = '❌ Lỗi: ' + e.message; }
+}
+
+async function gsPushQuestions() {
+  if (!GS_URL) { alert('Vui lòng dán link Google Apps Script trước!'); return; }
+  var status = document.getElementById('gsStatus');
+  status.textContent = 'Đang đẩy câu hỏi...';
+  try {
+    await fetch(GS_URL, { method:'POST', body:JSON.stringify({ action:'push_questions', questions:state.questions }) });
+    status.textContent = '✅ Đã đẩy câu hỏi lên Google Sheet!';
+  } catch (e) { status.textContent = '❌ Lỗi: ' + e.message; }
+}
+
+// ========== ADMIN PANEL ==========
+function openAdmin() {
+  document.getElementById('adminModal').classList.add('active');
+  switchTab('tab-questions');
+  renderQuestionBank();
+  renderStudents();
+  loadSettings();
+  renderScores();
+  document.getElementById('gsUrl').value = GS_URL;
+  document.getElementById('gsStatus').textContent = '✅ Đã kết nối Google Sheet thành công!';
+}
+function closeAdmin() { document.getElementById('adminModal').classList.remove('active'); }
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById(tabId).classList.add('active');
+  document.querySelector('.tab-btn[data-tab="'+tabId+'"]').classList.add('active');
+}
+
+// Tab 1: Question Bank
+function renderQuestionBank() {
+  var container = document.getElementById('tab-questions');
+  container.innerHTML = state.questions.map(function(q, qi) {
+    return '<div class="qb-question" id="qb-'+qi+'"><div class="qb-q-num">Câu '+(qi+1)+'</div><div class="qb-field"><label>Câu hỏi</label><textarea id="qb-q-text-'+qi+'">'+q.question+'</textarea></div><div class="qb-field"><label>Ảnh minh họa (Pinterest CDN URL)</label><input type="text" id="qb-q-img-'+qi+'" value="'+(q.image||'')+'" placeholder="https://i.pinimg.com/..."><img class="qb-preview-img" id="qb-q-preview-'+qi+'" src="'+(q.image||'')+'" onerror="this.style.display=\'none\'" onload="this.style.display=\'block\'"></div><div class="qb-field"><label>Đáp án</label><div class="qb-options"><div class="qb-opt-row"><input type="radio" name="qb-correct-'+qi+'" value="0"'+(q.correct===0?' checked':'')+'><input type="text" value="'+(q.options[0]||'')+'" id="qb-opt-0-'+qi+'"></div><div class="qb-opt-row"><input type="radio" name="qb-correct-'+qi+'" value="1"'+(q.correct===1?' checked':'')+'><input type="text" value="'+(q.options[1]||'')+'" id="qb-opt-1-'+qi+'"></div><div class="qb-opt-row"><input type="radio" name="qb-correct-'+qi+'" value="2"'+(q.correct===2?' checked':'')+'><input type="text" value="'+(q.options[2]||'')+'" id="qb-opt-2-'+qi+'"></div><div class="qb-opt-row"><input type="radio" name="qb-correct-'+qi+'" value="3"'+(q.correct===3?' checked':'')+'><input type="text" value="'+(q.options[3]||'')+'" id="qb-opt-3-'+qi+'"></div></div></div><div class="qb-field"><label>Lời giải thích sư phạm</label><textarea id="qb-q-exp-'+qi+'">'+(q.explanation||'')+'</textarea></div><button class="qb-remove-btn" onclick="removeQuestion('+qi+')">🗑 Xóa câu này</button></div>';
+  }).join('') + '<button class="add-q-btn" onclick="addQuestion()">+ Thêm câu hỏi mới</button><button class="btn-primary mt-12" onclick="saveQuestions()" style="width:auto;padding:12px 32px">💾 Lưu Câu Hỏi</button>';
+}
+function addQuestion() {
+  state.questions.push({ id:state.questions.length+1, question:'Câu hỏi mới?', image:'', options:['A','B','C','D'], correct:0, explanation:'Giải thích sẽ ở đây...' });
+  renderQuestionBank();
+}
+function removeQuestion(idx) {
+  if (state.questions.length <= 1) { alert('Cần ít nhất 1 câu hỏi!'); return; }
+  state.questions.splice(idx, 1);
+  renderQuestionBank();
+}
+function saveQuestions() {
+  state.questions.forEach(function(q, qi) {
+    q.question = document.getElementById('qb-q-text-'+qi).value;
+    q.image = document.getElementById('qb-q-img-'+qi).value;
+    q.explanation = document.getElementById('qb-q-exp-'+qi).value;
+    q.options = [0,1,2,3].map(function(i){ return document.getElementById('qb-opt-'+i+'-'+qi).value; });
+    q.correct = parseInt(document.querySelector('input[name="qb-correct-'+qi+']:checked')?.value || 0);
+  });
+  setLS('tianVanQuestions', state.questions);
+  alert('Đã lưu ' + state.questions.length + ' câu hỏi!');
+}
+
+// Tab 2: Students
+function renderStudents() {
+  var students = getLS('tianVanStudents', []);
+  var container = document.getElementById('tab-students');
+  container.innerHTML = students.map(function(s, i) {
+    return '<div class="student-item"><span class="student-avatar-select" onclick="cycleAvatar('+i+')">'+s.avatar+'</span><input class="student-name-input" value="'+s.name+'" onchange="updateStudent('+i+", 'name', this.value)"><button class="del-btn" onclick="removeStudent("+i+")">✕</button></div>";
+  }).join('') + '<button class="add-student-btn" onclick="addStudent()">+ Thêm học sinh</button>';
+}
+function cycleAvatar(idx) {
+  var students = getLS('tianVanStudents', []);
+  var avs = ['🧑‍🚀','👩‍🚀','🧒‍🚀','👨‍🔬','👩‍🔬','🦸','🦸‍♀️','🤖','🐱','🦊'];
+  var cur = avs.indexOf(students[idx]?.avatar || '🧑‍🚀');
+  students[idx].avatar = avs[(cur + 1) % avs.length];
+  setLS('tianVanStudents', students);
+  renderStudents();
+}
+function updateStudent(idx, key, val) {
+  var students = getLS('tianVanStudents', []);
+  students[idx][key] = val;
+  setLS('tianVanStudents', students);
+}
+function addStudent() {
+  var students = getLS('tianVanStudents', []);
+  students.push({ name:'Học sinh '+(students.length+1), avatar:'🧑‍🚀' });
+  setLS('tianVanStudents', students);
+  renderStudents();
+}
+function removeStudent(idx) {
+  var students = getLS('tianVanStudents', []);
+  students.splice(idx, 1);
+  setLS('tianVanStudents', students);
+  renderStudents();
+}
+
+// Tab 3: Settings
+function loadSettings() {
+  var s = getLS('tianVanSettings', {});
+  document.getElementById('settingQCount').value = s.qCount || 5;
+  document.getElementById('toggleTimer').classList.toggle('on', s.timerEnabled !== false);
+  document.getElementById('settingTimerSec').value = s.timerSec || 30;
+  document.getElementById('settingGameName').value = s.gameName || 'Thiên Văn Học';
+}
+function saveSettings() {
+  var s = { qCount:parseInt(document.getElementById('settingQCount').value), timerEnabled:document.getElementById('toggleTimer').classList.contains('on'), timerSec:parseInt(document.getElementById('settingTimerSec').value), gameName:document.getElementById('settingGameName').value };
+  setLS('tianVanSettings', s);
+  state.timerEnabled = s.timerEnabled;
+  state.timerSeconds = s.timerSec;
+  alert('Đã lưu cài đặt!');
+}
+document.getElementById('toggleTimer').addEventListener('click', function() { this.classList.toggle('on'); });
+
+// Tab 4: Scores
+function renderScores() {
+  var scores = getScores();
+  var body = document.getElementById('scoresBody');
+  if (scores.length === 0) { body.innerHTML = '<tr><td colspan="6" style="padding:20px;color:var(--text-muted);">Chưa có điểm nào</td></tr>'; return; }
+  body.innerHTML = scores.map(function(s, i) {
+    return '<tr><td>'+ (i+1) +'</td><td style="font-size:20px">'+s.avatar+'</td><td>'+s.name+'</td><td style="color:var(--accent);font-weight:900">'+s.score+'</td><td>'+'⭐'.repeat(s.stars)+'</td><td style="font-size:0.78rem;color:var(--text-muted)">'+(s.date||'')+'</td></tr>';
+  }).join('');
+}
+
+// Tab 6: Backup
+function exportJSON() {
+  var data = { questions:state.questions, scores:getScores(), settings:getLS('tianVanSettings',{}), exportDate:new Date().toISOString() };
+  var blob = new Blob([JSON.stringify(data,null,2)], { type:'application/json' });
+  var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'thien-van-hoc-backup-'+Date.now()+'.json'; a.click(); URL.revokeObjectURL(a.href);
+}
+function importJSON(file) {
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var data = JSON.parse(e.target.result);
+      if (data.questions) { state.questions=data.questions; setLS('tianVanQuestions',data.questions); }
+      if (data.scores) setLS('tianVanScores',data.scores);
+      if (data.settings) setLS('tianVanSettings',data.settings);
+      alert('Đã khôi phục dữ liệu!');
+      location.reload();
+    } catch(err) { alert('File không hợp lệ!'); }
+  };
+  reader.readAsText(file);
+}
+function downloadHTML() {
+  var html = document.documentElement.outerHTML;
+  var blob = new Blob(['<!DOCTYPE html>\n'+html], { type:'text/html' });
+  var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'thien-van-hoc-game.html'; a.click(); URL.revokeObjectURL(a.href);
+}
+
+// ========== START GAME ==========
+function startGame() {
+  initAudio();
+  var nameInput = document.getElementById('playerName').value.trim();
+  if (!nameInput) { document.getElementById('playerName').style.borderColor='var(--danger)'; document.getElementById('playerName').focus(); return; }
+  state.playerName = nameInput;
+  state.currentIndex=0; state.score=0; state.stars=0; state.combo=0; state.maxCombo=0; state.correctCount=0;
+  state.startTime=Date.now(); state.gameStarted=true;
+  var s = getLS('tianVanSettings', {});
+  state.timerEnabled = s.timerEnabled !== false;
+  state.timerSeconds = s.timerSec || 30;
+  var savedQ = getLS('tianVanQuestions', null);
+  state.questions = savedQ || DEFAULT_QUESTIONS.map(function(q){ return {...q}; });
+  if (state.questions.length > (s.qCount || 5)) {
+    state.questions = shuffleArray([...state.questions]).slice(0, s.qCount || 5);
+  }
+  document.getElementById('hud').classList.add('active');
+  showScreen('gameScreen');
+  renderQuestion();
+  startBGM();
+}
+function shuffleArray(arr) { for(var i=arr.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var temp=arr[i]; arr[i]=arr[j]; arr[j]=temp; } return arr; }
+function retryGame() {
+  state.currentIndex=0; state.score=0; state.stars=0; state.combo=0; state.maxCombo=0; state.correctCount=0;
+  state.startTime=Date.now(); state.gameStarted=true;
+  document.getElementById('hud').classList.add('active');
+  showScreen('gameScreen');
+  renderQuestion();
+  startBGM();
+}
+function goToLibrary() { stopBGM(); stopCountdown(); window.location.href='../index.html'; }
+
+// ========== EVENT LISTENERS ==========
+document.getElementById('startBtn').addEventListener('click', startGame);
+document.getElementById('adminBtn').addEventListener('click', openAdmin);
+document.getElementById('modalClose').addEventListener('click', closeAdmin);
+document.getElementById('adminModal').addEventListener('click', function(e) { if(e.target===document.getElementById('adminModal')) closeAdmin(); });
+document.getElementById('soundBtn').addEventListener('click', function() { state.soundEnabled=!state.soundEnabled; document.getElementById('soundBtn').textContent=state.soundEnabled?'🔊':'🔇'; if(!state.soundEnabled) stopBGM(); else if(state.gameStarted) startBGM(); });
+document.getElementById('settingsBtn').addEventListener('click', openAdmin);
+document.getElementById('retryBtn').addEventListener('click', retryGame);
+document.getElementById('backToLibraryBtn').addEventListener('click', goToLibrary);
+document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
+document.getElementById('gsFetchBtn').addEventListener('click', gsFetch);
+document.getElementById('gsPushBtn').addEventListener('click', gsPush);
+document.getElementById('gsPushQBtn').addEventListener('click', gsPushQuestions);
+document.getElementById('exportJsonBtn').addEventListener('click', exportJSON);
+document.getElementById('importJsonBtn').addEventListener('click', function(){ document.getElementById('importFileInput').click(); });
+document.getElementById('importFileInput').addEventListener('change', function(e){ if(e.target.files[0]) importJSON(e.target.files[0]); });
+document.getElementById('downloadHtmlBtn').addEventListener('click', downloadHTML);
+document.getElementById('clearScoresBtn').addEventListener('click', function(){ if(confirm('Xóa toàn bộ bảng điểm?')) { setLS('tianVanScores',[]); renderScores(); renderPodium(); } });
+document.getElementById('tabsNav').addEventListener('click', function(e) { var btn=e.target.closest('.tab-btn'); if(btn) switchTab(btn.dataset.tab); });
+document.getElementById('playerName').addEventListener('keypress', function(e){ if(e.key==='Enter') startGame(); });
+
+// ========== SAVE GS URL WHEN CHANGED ==========
+document.getElementById('gsUrl').addEventListener('input', function() {
+  GS_URL = this.value.trim();
+  localStorage.setItem('tianVanGSUrl', GS_URL);
+  document.getElementById('gsStatus').textContent = '✅ Đã lưu link mới!';
+});
+
+// ========== INIT ==========
+renderAvatarPicker();
+
+// Auto-load saved GS URL on page load
+(function() {
+  var savedUrl = localStorage.getItem('tianVanGSUrl');
+  if (savedUrl) {
+    GS_URL = savedUrl;
+    var input = document.getElementById('gsUrl');
+    if (input) input.value = GS_URL;
+    document.getElementById('gsStatus').textContent = '✅ Đã kết nối Google Sheet!';
+  }
+})();
+
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ document.body.classList.add('fonts-loaded'); });
+</script>
+</body>
+</html>

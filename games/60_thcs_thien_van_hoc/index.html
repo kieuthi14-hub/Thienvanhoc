@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thiên Văn Học - Hệ Mặt Trời & Vũ Trụ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0284C7;
+      --primary-light: #38BDF8;
+      --accent: #F59E0B;
+      --success: #10B981;
+      --danger: #EF4444;
+      --text-dark: #1E293B;
+      --text-muted: #64748B;
+      --radius: 24px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Nunito', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(160deg, #F0F9FF, #FEF9C3 35%, #FDF2F8 70%, #F0FDF4);
+      padding: 20px;
+    }
+    .wave-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -1; overflow: hidden; }
+    .wave-bg::before {
+      content: ''; position: absolute; width: 200%; height: 200%;
+      background: radial-gradient(ellipse at center, rgba(2,132,199,0.06) 0%, transparent 70%);
+      animation: waveMove 25s ease-in-out infinite;
+    }
+    @keyframes waveMove {
+      0%, 100% { transform: translate(-10%, -10%) rotate(0deg); }
+      50% { transform: translate(10%, 10%) rotate(5deg); }
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--primary);
+      font-weight: 800;
+      text-decoration: none;
+      font-size: 0.95rem;
+      margin-bottom: 24px;
+      padding: 8px 16px;
+      background: white;
+      border-radius: 50px;
+      box-shadow: 0 4px 0 rgba(2,132,199,0.2), 0 8px 15px rgba(0,0,0,0.06);
+      border-bottom: 3px solid rgba(2,132,199,0.3);
+      transition: all 0.2s;
+    }
+    .back-link:hover { transform: translateY(-2px); }
+    .back-link:active { transform: translateY(2px); border-bottom-width: 2px; }
+    .topic-hero {
+      text-align: center;
+      padding: 40px 20px;
+      max-width: 600px;
+      margin: 0 auto 40px;
+    }
+    .topic-icon { font-size: 80px; display: block; margin-bottom: 16px; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.15)); }
+    .topic-title {
+      font-size: clamp(1.5rem, 4vw, 2.4rem);
+      font-weight: 900;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+    .topic-sub {
+      font-size: clamp(0.9rem, 2.5vw, 1.05rem);
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    .start-section {
+      max-width: 500px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .start-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white;
+      font-weight: 800;
+      font-size: clamp(1.1rem, 3vw, 1.4rem);
+      padding: 18px 48px;
+      border-radius: 60px;
+      text-decoration: none;
+      box-shadow: 0 8px 0 rgba(2,132,199,0.4), 0 16px 30px rgba(0,0,0,0.12);
+      border-bottom: 5px solid rgba(2,132,199,0.5);
+      transition: all 0.2s;
+    }
+    .start-btn:hover { transform: translateY(-4px); box-shadow: 0 12px 0 rgba(2,132,199,0.4), 0 22px 40px rgba(0,0,0,0.15); }
+    .start-btn:active { transform: translateY(3px); box-shadow: 0 4px 0 rgba(2,132,199,0.4), 0 8px 15px rgba(0,0,0,0.1); }
+    .info-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      max-width: 600px;
+      margin: 30px auto 0;
+    }
+    .info-card {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 6px 0 rgba(0,0,0,0.06), 0 12px 20px rgba(0,0,0,0.05);
+      border-bottom: 4px solid rgba(0,0,0,0.06);
+    }
+    .info-card .ic-icon { font-size: 32px; margin-bottom: 8px; }
+    .info-card .ic-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 700; }
+    .info-card .ic-value { font-size: 1rem; color: var(--text-dark); font-weight: 800; }
+    @media (max-width: 480px) {
+      body { padding: 16px; }
+      .topic-hero { padding: 24px 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wave-bg"></div>
+  <a href="../index.html" class="back-link">⬅ Quay lại thư viện</a>
+  <section class="topic-hero">
+    <span class="topic-icon">🪐</span>
+    <h1 class="topic-title">Thiên Văn Học</h1>
+    <p class="topic-sub">Hệ Mặt Trời & Vũ Trụ Bao La<br>Khám phá các hành tinh, mặt trăng, nhật thực, nguyệt thực và thiên hà!</p>
+  </section>
+  <section class="start-section">
+    <a href="game_01_Bat_dau.html" class="start-btn">🚀 Bắt Đầu Khám Phá</a>
+    <div class="info-cards">
+      <div class="info-card"><div class="ic-icon">❓</div><div class="ic-value">5 câu hỏi</div><div class="ic-label">Tình huống</div></div>
+      <div class="info-card"><div class="ic-icon">⭐</div><div class="ic-value">3 sao</div><div class="ic-label">Mỗi câu đúng</div></div>
+      <div class="info-card"><div class="ic-icon">🔥</div><div class="ic-value">Combo</div><div class="ic-label">Thưởng streak</div></div>
+      <div class="info-card"><div class="ic-icon">🏆</div><div class="ic-value">Bảng Xếp Hạng</div><div class="ic-label">Podium 3D</div></div>
+    </div>
+  </section>
+</body>
+</html>

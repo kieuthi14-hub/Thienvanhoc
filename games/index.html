@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thư Viện Trò Chơi - Trò Chơi Vui</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0284C7;
+      --primary-light: #38BDF8;
+      --accent: #F59E0B;
+      --accent-light: #FBBF24;
+      --success: #10B981;
+      --danger: #EF4444;
+      --warning: #F97316;
+      --bg-start: #F0F9FF;
+      --bg-mid: #FEF9C3;
+      --bg-end: #FDF2F8;
+      --text-dark: #1E293B;
+      --text-muted: #64748B;
+      --card-shadow: 0 8px 0 rgba(2,132,199,0.3), 0 15px 25px rgba(0,0,0,0.08);
+      --radius: 24px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Nunito', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(160deg, var(--bg-start), var(--bg-mid) 35%, var(--bg-end) 70%, #F0FDF4);
+      padding: 20px;
+    }
+    .wave-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -1; overflow: hidden; }
+    .wave-bg::before {
+      content: '';
+      position: absolute;
+      width: 200%; height: 200%;
+      background: radial-gradient(ellipse at center, rgba(2,132,199,0.06) 0%, transparent 70%);
+      animation: waveMove 25s ease-in-out infinite;
+    }
+    @keyframes waveMove {
+      0%, 100% { transform: translate(-10%, -10%) rotate(0deg); }
+      50% { transform: translate(10%, 10%) rotate(5deg); }
+    }
+    .header { text-align: center; padding: 20px 0 40px; }
+    .header h1 {
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-weight: 900;
+      color: var(--primary);
+      text-shadow: 0 2px 0 rgba(2,132,199,0.2);
+    }
+    .header p { font-size: clamp(0.95rem, 2.5vw, 1.1rem); color: var(--text-muted); margin-top: 8px; }
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 10px;
+    }
+    .game-card {
+      background: white;
+      border-radius: var(--radius);
+      padding: 28px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: var(--card-shadow);
+      border: 3px solid transparent;
+      position: relative;
+      overflow: hidden;
+    }
+    .game-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .game-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      border-color: var(--primary-light);
+      box-shadow: 0 16px 0 rgba(2,132,199,0.3), 0 25px 40px rgba(0,0,0,0.12);
+    }
+    .game-card:active {
+      transform: translateY(2px);
+      box-shadow: 0 4px 0 rgba(2,132,199,0.3), 0 8px 15px rgba(0,0,0,0.08);
+    }
+    .game-icon {
+      font-size: 56px;
+      margin-bottom: 16px;
+      display: block;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+    }
+    .game-title {
+      font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+    .game-desc {
+      font-size: clamp(0.85rem, 2vw, 0.95rem);
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+    .game-tag {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-right: 6px;
+    }
+    .play-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white;
+      font-weight: 800;
+      padding: 10px 24px;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      border-bottom: 4px solid rgba(2,132,199,0.5);
+      transition: all 0.15s;
+      margin-top: 12px;
+    }
+    .play-btn:hover { transform: translateY(-2px); border-bottom-width: 6px; }
+    .play-btn:active { transform: translateY(2px); border-bottom-width: 2px; }
+    .zalo-widget {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: linear-gradient(135deg, #0068FF, #4D94FF);
+      color: white;
+      padding: 14px 22px;
+      border-radius: 50px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0,104,255,0.4);
+      border-bottom: 4px solid rgba(0,80,200,0.5);
+      transition: all 0.2s;
+      z-index: 100;
+    }
+    .zalo-widget:hover { transform: translateY(-3px) scale(1.05); }
+    .zalo-widget:active { transform: translateY(2px); border-bottom-width: 2px; }
+    @media (max-width: 640px) {
+      .games-grid { grid-template-columns: 1fr; padding: 0; }
+      .zalo-widget { bottom: 16px; right: 16px; padding: 12px 18px; font-size: 0.85rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wave-bg"></div>
+  <header class="header">
+    <h1>🎮 Thư Viện Trò Chơi</h1>
+    <p>Chọn chủ đề để bắt đầu khám phá!</p>
+  </header>
+  <main class="games-grid">
+    <a href="60_thcs_thien_van_hoc/game_01_Bat_dau.html" class="game-card">
+      <span class="game-icon">🌌</span>
+      <h2 class="game-title">Thiên Văn Học</h2>
+      <p class="game-desc">Khám phá Hệ Mặt Trời, vũ trụ bao la và các hiện tượng nhật thực, nguyệt thực.</p>
+      <span class="game-tag">THCS</span>
+      <span class="game-tag">Khoa Học</span>
+      <div class="play-btn">▶ Bắt Đầu</div>
+    </a>
+    <!-- Placeholder for future games -->
+    <div class="game-card" style="opacity:0.6; cursor:not-allowed;">
+      <span class="game-icon">🧪</span>
+      <h2 class="game-title">Hóa Học Vui</h2>
+      <p class="game-desc">Sắp xếp sắp đến! Hãy kiên nhẫn nào...</p>
+      <span class="game-tag">Sắp Ra Mắt</span>
+    </div>
+    <div class="game-card" style="opacity:0.6; cursor:not-allowed;">
+      <span class="game-icon">📐</span>
+      <h2 class="game-title">Toán Học Kỳ Thú</h2>
+      <p class="game-desc">Sắp xếp sắp đến! Hãy kiên nhẫn nào...</p>
+      <span class="game-tag">Sắp Ra Mắt</span>
+    </div>
+    <div class="game-card" style="opacity:0.6; cursor:not-allowed;">
+      <span class="game-icon">🌍</span>
+      <h2 class="game-title">Địa Lý Thế Giới</h2>
+      <p class="game-desc">Sắp xếp sắp đến! Hãy kiên nhẫn nào...</p>
+      <span class="game-tag">Sắp Ra Mắt</span>
+    </div>
+  </main>
+  <button class="zalo-widget" onclick="alert('Kết nối Zalo OA sẽ mở trong phiên bản sau!')">
+    💬 Trợ Giảng Viên (Zalo)
+  </button>
+  <script>
+    // PWA install prompt handler
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      deferredPrompt = e;
+    });
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('../sw.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>
